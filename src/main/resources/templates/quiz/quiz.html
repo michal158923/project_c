@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module" src="../quiz/quiz.js" defer></script>
+</head>
+<body>
+
+<p id="userCode" th:text="${userCode}" hidden></p>
+
+<h3>QUIZ</h3>
+<p id="questionCounter">questionCounter</p>
+<p id="questionContent">QuestionContent</p>
+<button id="btnAnswer1">btnAnswer1</button><br>
+<button id="btnAnswer2">btnAnswer2</button><br>
+<button id="btnAnswer3">btnAnswer3</button><br>
+<button id="btnAnswer4">btnAnswer4</button><br>
+<p id="info"></p>
+<button id="toContinue" hidden>next question</button><br>
+</body>
+</html>

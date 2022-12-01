@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module" src="../login.js" defer></script>
+
+</head>
+<body>
+
+<h3>LOGGING IN</h3>
+<p id="isNotAuthenticated" th:text="${info}"></p>
+<p>login:</p>
+<input id="loginLog" type="text"></input><br>
+<p>password:</p>
+<input id="passwordLog" type="text"></input><br><br>
+<button id="submitLog" type="button">login</button>
+<p id="infoLog"></p>
+
+</body>
+</html>
