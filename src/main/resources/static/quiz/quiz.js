@@ -20,12 +20,11 @@ function getData  ()  {
         data = responseData
         if (data.questionCount !=  'quiz has been finished') {
             document.getElementById('questionCounter').innerHTML = 'pytanie: ' +  data.questionCount;
-            document.getElementById('questionContent').innerHTML = data.question.questionContent;
-            document.getElementById('btnAnswer1').innerHTML = data.answers[0].answerContent;
-            document.getElementById('btnAnswer2').innerHTML = data.answers[1].answerContent;
-            document.getElementById('btnAnswer3').innerHTML = data.answers[2].answerContent;
-            document.getElementById('btnAnswer4').innerHTML = data.answers[3].answerContent;
-            console.log(data);
+            document.getElementById('questionContent').innerHTML = data.questionDto.content;
+            document.getElementById('btnAnswer1').innerHTML = data.answers[0].content;
+            document.getElementById('btnAnswer2').innerHTML = data.answers[1].content;
+            document.getElementById('btnAnswer3').innerHTML = data.answers[2].content;
+            document.getElementById('btnAnswer4').innerHTML = data.answers[3].content;
         } else {
             window.location.href = 'http://localhost:8080/quiz/end?userCode=' + userCode
         }
@@ -39,7 +38,7 @@ function checkAnswer (givenAnswerId) {
     const userCode = document.getElementById('userCode').textContent
     sendHttpRequest('POST', 'http://localhost:8080/quiz/checkAnswer?userCode=' + userCode,
         {
-            questionId: data.question.id,
+            questionId: data.questionDto.id,
             givenAnswerId: givenAnswerId
         })
     .then(responseData => {

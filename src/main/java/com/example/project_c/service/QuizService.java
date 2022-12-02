@@ -1,17 +1,19 @@
 package com.example.project_c.service;
 
-import com.example.project_c.controller.quiz.dto.QuestionAndAnswersResponse;
+import com.example.project_c.controller.quiz.dto.*;
 import com.example.project_c.model.home.MyUser;
+import com.example.project_c.model.quiz.Answer;
 import com.example.project_c.model.quiz.Question;
 import com.example.project_c.model.quiz.UserAnswer;
 import com.example.project_c.model.quiz.dao.AnswerDao;
 import com.example.project_c.model.quiz.dao.QuestionAndAnswers;
 import com.example.project_c.model.quiz.dao.QuestionDao;
+import com.example.project_c.model.quiz.dao.ScoreBoardDao;
 import com.example.project_c.model.quiz.random_code.RandomCode;
 import com.example.project_c.repository.home.MyUserRepository;
 import com.example.project_c.repository.quiz.AnswerRepository;
 import com.example.project_c.repository.quiz.QuestionRepository;
-import com.example.project_c.repository.quiz.UserAnswerRepositoriesImpl;
+import com.example.project_c.repository.quiz.QuizRepositoriesImpl;
 import com.example.project_c.repository.quiz.UserAnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -38,24 +41,48 @@ public class QuizService {
     @Autowired
     private final UserAnswerRepository userAnswerRepository;
     @Autowired
-    private final UserAnswerRepositoriesImpl userAnswerRepositoriesImpl;
+    private final QuizRepositoriesImpl quizRepositoriesImpl;
 
 
     public QuestionAndAnswersResponse next(MyUser user) {
-        List<QuestionAndAnswers> questionAndAnswers = userAnswerRepositoriesImpl.findQuestionAndAnswersForUser(user);
+        List<QuestionAndAnswers> questionAndAnswers = quizRepositoriesImpl.findQuestionAndAnswersForUser(user);
         if (questionAndAnswers.size() == 0) {
             createEmptyUserAnswerSet(user);
-            questionAndAnswers = userAnswerRepositoriesImpl.findQuestionAndAnswersForUser(user);
+            questionAndAnswers = quizRepositoriesImpl.findQuestionAndAnswersForUser(user);
         }
-
-
-        Map<QuestionDao, List<AnswerDao>> mapQuestionAnswerListDao = questionAndAnswers.stream()
+        Map<QuestionDao, List<AnswerDao>> mapQuestionNullAnswerListDao = questionAndAnswers.stream()
+                .filter(qaa -> qaa.getGivenAnswerId() == null)
                 .collect(
                         Collectors.groupingBy(QuestionAndAnswers::getQuestionDao,
-                                Collectors.mapping(QuestionAndAnswers::getAnswerDao,Collectors.toList()))
-                );
+                                Collectors.mapping(QuestionAndAnswers::getAnswerDao, Collectors.toList())));
+        int leftQuestionNumber = QUIZ_LENGTH - mapQuestionNullAnswerListDao.size() + 1;
+        if (leftQuestionNumber != QUIZ_LENGTH + 1)
+            return questionAnswerToDto(mapQuestionNullAnswerListDao, user, leftQuestionNumber);
+        return QuestionAndAnswersResponse.builder().questionCount("quiz has been finished").build();
+    }
 
-        return null;
+    private QuestionAndAnswersResponse questionAnswerToDto(Map<QuestionDao, List<AnswerDao>> mapQuestionNullAnswerListDao, MyUser user, int leftQuestionNumber) {
+        QuestionAndAnswersResponse questionAndAnswersResponse = new QuestionAndAnswersResponse();
+        for (Map.Entry<QuestionDao, List<AnswerDao>> entry : mapQuestionNullAnswerListDao.entrySet()) {
+            QuestionDto questionDto = QuestionDto.builder()
+                    .Id(entry.getKey().getId())
+                    .content(entry.getKey().getContent())
+                    .build();
+            List<AnswerDto> answerDtoList = entry.getValue().stream()
+                    .map(answerDao -> AnswerDto.builder()
+                            .id(answerDao.getId())
+                            .content(answerDao.getContent())
+                            .build())
+                    .collect(Collectors.toList());
+            questionAndAnswersResponse = QuestionAndAnswersResponse.builder()
+                    .userCode(user.getCode())
+                    .questionCount(leftQuestionNumber + "/" + QUIZ_LENGTH)
+                    .questionDto(questionDto)
+                    .answers(answerDtoList)
+                    .build();
+            break;
+        }
+        return questionAndAnswersResponse;
     }
 
     private void createEmptyUserAnswerSet(MyUser user) {
@@ -68,5 +95,34 @@ public class QuizService {
                     .lotQuestion(allQuestions.get(qi))
                     .build());
         userAnswerRepository.saveAll(userAnswerList);
+    }
+
+    public Info checkGivenAnswer(MyUser user, GivenAnswerRequest givenAnswerRequest) {
+        Answer answer = answerRepository.findById(givenAnswerRequest.getGivenAnswerId()).orElseThrow();
+        quizRepositoriesImpl.updateUserAnswer(
+                user.getId(),
+                givenAnswerRequest.getQuestionId(),
+                givenAnswerRequest.getGivenAnswerId(),
+                answer.isCorrectFlag());
+
+        if (answer.isCorrectFlag())
+            return new Info("correct");
+        return new Info("not correct");
+    }
+
+    public List<ScoreBoardDto> getScoreBoard() {
+        List<ScoreBoardDao> allUserAnswer = quizRepositoriesImpl.userAnswerJoinUser();
+        Map<String, Long> scoreboardMap = allUserAnswer.stream()
+                .filter(ScoreBoardDao::isCorrectChoiceFlag)
+                .collect(Collectors.groupingBy(ScoreBoardDao::getUserName, Collectors.counting()));
+        List<ScoreBoardDto> scoreBoard = new ArrayList<>();
+        for (Map.Entry<String, Long> entry : scoreboardMap.entrySet()) {
+            scoreBoard.add(ScoreBoardDto.builder()
+                    .userName(entry.getKey())
+                    .scores(entry.getValue())
+                    .build());
+        }
+        return scoreBoard;
+
     }
 }

@@ -15,5 +15,7 @@ public interface UserAnswerRepository extends JpaRepository<UserAnswer, Integer>
     List<UserAnswer> findAllByUser(MyUser user);
 
 
+
+
 //    public UserAnswer findFirstNullGivenAnswer(MyUser user);
 }

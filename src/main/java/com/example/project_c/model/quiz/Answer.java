@@ -1,9 +1,10 @@
 package com.example.project_c.model.quiz;
 
+import lombok.Getter;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
-
+@Getter
 @Entity
 public class Answer {
     @Id

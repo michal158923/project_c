@@ -21,7 +21,7 @@ public class QuestionAndAnswers {
     public QuestionDao getQuestionDao() {
         return QuestionDao.builder()
                 .id(getQuestionId())
-                .content(getAnswerContent())
+                .content(getQuestionContent())
                 .givenAnswerId(getGivenAnswerId())
                 .build();
     }

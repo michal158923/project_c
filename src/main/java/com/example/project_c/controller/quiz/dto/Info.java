@@ -1,13 +1,11 @@
 package com.example.project_c.controller.quiz.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
 @Builder
 @Getter
-public class AnswerDto {
-
-    private Integer id;
-    private String content;
-
+@AllArgsConstructor
+public class Info {
+    private String info;
 }
