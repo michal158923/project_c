@@ -51,8 +51,8 @@ public class HomeController {
     @PostMapping("/login/user")
     public @ResponseBody Info htmlLoginUser(Model model, @RequestBody CredentialDto credentialDto) throws Exception {
         String userCode = myUserService.isAuthorized(credentialDto);
-        if (userCode.isEmpty())
-            return new Info("none","password and login do not match");
+        if (userCode == null)
+            return new Info("none", "password and login do not match");
         else
             return new Info(userCode, "logged successfully");
     }

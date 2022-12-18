@@ -1,7 +1,8 @@
 INSERT INTO my_user (name,password,code,join_date) VALUES
     ('admin', 'admin','42UmLLz7LLKpb5TYUzVV','2022-11-28 12:50:29.785967'),
     ('user1', 'user1','XzcC7sl3fP8U7m2b2ZF8','2022-11-28 12:50:29.785967'),
-    ('user2', 'user2','63HYAwp4NNFY6c8PUC9r','2022-11-28 12:50:29.785967');
+    ('user2', 'user2','63HYAwp4NNFY6c8PUC9r','2022-11-28 12:50:29.785967'),
+    ('user3', 'user3','2T47538O916e0Pdcl9Kt','2022-12-09 11:26:30.407382');
 
 INSERT INTO question (id, content) VALUES
     (1, 'Z iloma państwami graniczy Ruminia?'),
@@ -124,4 +125,13 @@ INSERT INTO user_answer (correct_choice_flag, given_answer_id, lot_question_id, 
     ('FALSE', 19, 5 , 3),
     ('TRUE' , 60, 15, 3),
     ('TRUE' , 3 , 1 , 3),
-    ('TRUE' , 23, 5 , 3);
+    ('TRUE' , 23, 5 , 3),
+
+    ('TRUE' , 62, 16, 4),
+    ('TRUE' , 60, 15, 4),
+    ('TRUE' , 9 , 3 , 4),
+    ('TRUE' , 65, 17, 4),
+    ('FALSE', 74, 19, 4),
+    ('TRUE' , 14, 4 , 4),
+    ('TRUE' , 69, 18, 4),
+    ('FALSE', 38, 10, 4);

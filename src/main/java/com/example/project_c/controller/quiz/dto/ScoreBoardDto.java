@@ -9,5 +9,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ScoreBoardDto {
     private String userName;
-    private Long scores;
+    private String scores;
 }

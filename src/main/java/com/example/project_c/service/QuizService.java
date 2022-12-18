@@ -19,10 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -111,18 +108,20 @@ public class QuizService {
     }
 
     public List<ScoreBoardDto> getScoreBoard() {
-        List<ScoreBoardDao> allUserAnswer = quizRepositoriesImpl.userAnswerJoinUser();
-        Map<String, Long> scoreboardMap = allUserAnswer.stream()
+
+        Map<String, Long> scoreboardMap = quizRepositoriesImpl.userAnswerJoinUser().stream()
                 .filter(ScoreBoardDao::isCorrectChoiceFlag)
                 .collect(Collectors.groupingBy(ScoreBoardDao::getUserName, Collectors.counting()));
+
         List<ScoreBoardDto> scoreBoard = new ArrayList<>();
         for (Map.Entry<String, Long> entry : scoreboardMap.entrySet()) {
             scoreBoard.add(ScoreBoardDto.builder()
                     .userName(entry.getKey())
-                    .scores(entry.getValue())
+                    .scores(entry.getValue().toString())
                     .build());
         }
-        return scoreBoard;
-
+        return scoreBoard.stream()
+                .sorted(Comparator.comparing(ScoreBoardDto::getScores).reversed())
+                .collect(Collectors.toList());
     }
 }
